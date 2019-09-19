@@ -1,19 +1,15 @@
-// handleStaticRequests should deal with getting stuff out of KV
 import { getAssetFromKV } from "@cloudflare/kv-asset-handlers";
 
 addEventListener("fetch", event => {
-  event.respondWith(handleRequest(event.request));
+  event.respondWith(handleEvent(event));
 });
 
-async function handleRequest(request) {
-  let url = new URL(request.url);
-  if (url.pathname === "/") {
-    request = new Request(`${url}/index.html`);
-  }
+async function handleEvent(event) {
   try {
-    return await getAssetFromKV(request);
+    return await getAssetFromKV(event);
   } catch (e) {
-    return new Response(`"${url.pathname}" not found`, {
+    let pathname = new URL(event.request.url).pathname;
+    return new Response(`"${pathname}" not found`, {
       status: 404,
       statusText: "not found"
     });
